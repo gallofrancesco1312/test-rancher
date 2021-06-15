@@ -1,7 +1,7 @@
 namespace: test-app-1
 
 helm:
-  chart: https://github.com/gallofrancesco1312/test-rancher/blob/master/nginx/nginx-9.2.0.tgz
+  chart: https://github.com/gallofrancesco1312/test-rancher/raw/master/nginx/nginx-9.2.0.tgz
   # repo: https://charts.bitnami.com/bitnami
 
   # releaseName: nginx
