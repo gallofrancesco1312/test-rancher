@@ -1,0 +1,5 @@
+namespace: podinfo-ns
+helm:
+  chart: https://stefanprodan.github.io/podinfo/podinfo-5.2.1.tgz
+  values:
+    ui.color: '#55577c'
