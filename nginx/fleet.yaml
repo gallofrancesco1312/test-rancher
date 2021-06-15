@@ -1,0 +1,85 @@
+# The default namespace to be applied to resources. This field is not used to
+# enforce or lock down the deployment to a specific namespace, but instead
+# provide the default value of the namespace field if one is not specified
+# in the manifests.
+# Default: default
+defaultNamespace: test-app-1
+
+# All resources will be assigned to this namespace and if any cluster scoped
+# resource exists the deployment will fail.
+# Default: ""
+namespace: test-app-1
+
+# kustomize:
+  # Use a custom folder for kustomize resources. This folder must contain
+  # a kustomization.yaml file.
+#  dir: ./kustomize
+
+helm:
+  # Use a custom location for the Helm chart. This can refer to any go-getter URL.
+  # This allows one to download charts from most any location.  Also know that
+  # go-getter URL supports adding a digest to validate the download. If repo
+  # is set below this field is the name of the chart to lookup
+  #chart: ./chart
+  # A https URL to a Helm repo to download the chart from. It's typically easier
+  # to just use `chart` field and refer to a tgz file.  If repo is used the
+  # value of `chart` will be used as the chart name to lookup in the Helm repository.
+  repo: https://charts.bitnami.com/bitnami
+  # A custom release name to deploy the chart as. If not specified a release name
+  # will be generated.
+  releaseName: nginx
+  # The version of the chart or semver constraint of the chart to find. If a constraint
+  # is specified it is evaluated each time git changes.
+  version: 9.2.0
+  # Any values that should be placed in the `values.yaml` and passed to helm during
+  # install.
+  #values:
+  #  any-custom: value
+  # All labels on Rancher clusters are available using global.fleet.clusterLabels.LABELNAME
+  # These can now be accessed directly as variables
+    variableName: global.fleet.clusterLabels.LABELNAME
+  # Path to any values files that need to be passed to helm during install
+  #valuesFiles:
+  #  - values1.yaml
+  #  - values2.yaml  
+  # Override immutable resources. This could be dangerous.
+  force: false
+
+# A paused bundle will not update downstream clusters but instead mark the bundle
+# as OutOfSync. On can the manually confirm that a bundle should be deployed to
+# the downstream clusters.
+# Default: false
+paused: false
+
+# Target customization are used to determine how resources should be modified per target
+# Targets are evaluated in order and the first one to match a cluster is used for that cluster.
+targetCustomizations:
+# The name of target. If not specified a default name of the format "target000"
+# will be used. This value is mostly for display
+- name: target1
+  # Custom namespace value overriding the value at the root
+  # namespace: newvalue
+  # Custom kustomize options overriding the options at the root
+  # kustomize: {}
+  # Custom Helm options override the options at the root
+  helm: {
+    values:
+      replicas: 3
+  }
+  # If using raw YAML these are names that map to overlays/{name} that will be used
+  # to replace or patch a resource. If you wish to customize the file ./subdir/resource.yaml
+  # then a file ./overlays/myoverlay/subdir/resource.yaml will replace the base file.
+  # A file named ./overlays/myoverlay/subdir/resource_patch.yaml will patch the base file.
+  # A patch can in JSON Patch or JSON Merge format or a strategic merge patch for builtin
+  # Kubernetes types. Refer to "Raw YAML Resource Customization" below for more information.
+  #yaml:
+  #  overlays:
+  #  - custom2
+  #  - custom3
+  # A selector used to match clusters.  The structure is the standard
+  # metav1.LabelSelector format. If clusterGroupSelector or clusterGroup is specified,
+  # clusterSelector will be used only to further refine the selection after
+  # clusterGroupSelector and clusterGroup is evaluated.
+  clusterSelector:
+    matchLabels:
+      env: test
