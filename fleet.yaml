@@ -1,0 +1,101 @@
+# This file and all contents in it are OPTIONAL.
+
+# The namespace this chart will be installed to,
+# if not specified the chart will be installed to "default"
+namespace: velero-ns
+
+# Custom helm options
+helm:
+  # The release name to use. If empty a generated release name will be used
+  releaseName: velero
+
+  # The directory of the chart in the repo.  Also any valid go-getter supported
+  # URL can be used there is specify where to download the chart from.
+  # If repo below is set this value if the chart name in the repo
+  chart: ""
+
+  # An https to a valid Helm repository to download the chart from
+  repo: "https://vmware-tanzu.github.io/helm-charts/"
+
+  # Custom values that will be passed as values.yaml to the installation
+  values:
+    dnsPolicy: ClusterFirst
+
+    # Init containers to add to the Velero deployment's pod spec. At least one plugin provider image is required.
+    initContainers:
+      - name: velero-plugin-for-microsoft-azure
+        image: velero/velero-plugin-for-microsoft-azure:v1.2.0
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+
+    # SecurityContext to use for the Velero deployment. Optional.
+    # Set fsGroup for `AWS IAM Roles for Service Accounts`
+      @@ -144,60 +144,31 @@ cleanUpCRDs: false
+    ##
+    configuration:
+      # Cloud provider being used (e.g. aws, azure, gcp).
+      provider: azure
+
+      # Parameters for the `default` BackupStorageLocation. See
+      # https://velero.io/docs/v1.6/api-types/backupstoragelocation/
+      backupStorageLocation:
+        # bucket is the name of the bucket to store backups in. Required.
+        bucket: velero-backups
+        # Additional provider-specific configuration. See link above
+        # for details of required/optional fields for your provider.
+        config: 
+          #region: francecentral
+          resourceGroup: multi-cloud-blob-storage
+          subscriptionId: 05476e17-e88b-43a4-a2de-12e26e0717f1
+          storageAccount: veleroc726e109930b
+
+
+      # Parameters for the `default` VolumeSnapshotLocation. See
+      # https://velero.io/docs/v1.6/api-types/volumesnapshotlocation/
+      volumeSnapshotLocation:
+        # Additional provider-specific configuration. See link above
+        # for details of required/optional fields for your provider.
+        config: 
+          resourceGroup: multi-cloud-blob-storage
+      #    The ID of the subscription where volume snapshots should be stored, if different from the cluster’s subscription. If specified, also requires `configuration.volumeSnapshotLocation.config.resourceGroup`to be set. (Azure only)
+          subscriptionId: 05476e17-e88b-43a4-a2de-12e26e0717f1
+
+      # These are server-level settings passed as CLI flags to the `velero server` command. Velero
+      # uses default values if they're not passed in, so they only need to be explicitly specified
+      @@ -267,7 +238,7 @@ credentials:
+      # kiam to provide IAM credentials for the Velero pod.
+      useSecret: true
+      # Name of the secret to create if `useSecret` is true and `existingSecret` is empty
+      name: velero
+      # Name of a pre-existing secret (if any) in the Velero namespace
+      # that should be used to get IAM account credentials. Optional.
+      existingSecret:
+      @@ -279,11 +250,14 @@ credentials:
+      # [AWS] https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/main/README.md
+      # [GCP] https://github.com/vmware-tanzu/velero-plugin-for-gcp/blob/main/README.md
+      # [Azure] https://github.com/vmware-tanzu/velero-plugin-for-microsoft-azure/blob/main/README.md
+      secretContents:
+        cloud: |
+            AZURE_SUBSCRIPTION_ID=05476e17-e88b-43a4-a2de-12e26e0717f1
+            AZURE_TENANT_ID=b00367e2-193a-4f48-94de-7245d45c0947
+            AZURE_CLIENT_ID=61e8bc8a-02dd-4228-8189-fe89e8432067
+            AZURE_CLIENT_SECRET=4pg~iuocfWNh-q~HE~ULzlU5m8z75r0FXV
+            AZURE_RESOURCE_GROUP=multi-cloud-blob-storage
+            AZURE_CLOUD_NAME=AzurePublicCloud
+      # additional key/value pairs to be used as environment variables such as "DIGITALOCEAN_TOKEN: <your-key>". Values will be stored in the secret.
+      extraEnvVars: {}
+      # Name of a pre-existing secret (if any) in the Velero namespace
+      @@ -297,11 +271,11 @@ backupsEnabled: true
+    snapshotsEnabled: true
+
+    # Whether to deploy the restic daemonset.
+    deployRestic: true
+
+    restic:
+      podVolumePath: /var/lib/kubelet/pods
+      privileged: true
+      # Pod priority class name to use for the Restic daemonset. Optional.
+      priorityClassName: ""
+      # Resource requests/limits to specify for the Restic daemonset deployment. Optional.
