@@ -32,7 +32,7 @@ helm:
 
     # SecurityContext to use for the Velero deployment. Optional.
     # Set fsGroup for `AWS IAM Roles for Service Accounts`
-      @@ -144,60 +144,31 @@ cleanUpCRDs: false
+    cleanUpCRDs: false
     ##
     configuration:
       # Cloud provider being used (e.g. aws, azure, gcp).
@@ -64,7 +64,7 @@ helm:
 
       # These are server-level settings passed as CLI flags to the `velero server` command. Velero
       # uses default values if they're not passed in, so they only need to be explicitly specified
-      @@ -267,7 +238,7 @@ credentials:
+      credentials:
       # kiam to provide IAM credentials for the Velero pod.
       useSecret: true
       # Name of the secret to create if `useSecret` is true and `existingSecret` is empty
@@ -72,7 +72,7 @@ helm:
       # Name of a pre-existing secret (if any) in the Velero namespace
       # that should be used to get IAM account credentials. Optional.
       existingSecret:
-      @@ -279,11 +250,14 @@ credentials:
+      credentials:
       # [AWS] https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/main/README.md
       # [GCP] https://github.com/vmware-tanzu/velero-plugin-for-gcp/blob/main/README.md
       # [Azure] https://github.com/vmware-tanzu/velero-plugin-for-microsoft-azure/blob/main/README.md
@@ -87,7 +87,7 @@ helm:
       # additional key/value pairs to be used as environment variables such as "DIGITALOCEAN_TOKEN: <your-key>". Values will be stored in the secret.
       extraEnvVars: {}
       # Name of a pre-existing secret (if any) in the Velero namespace
-      @@ -297,11 +271,11 @@ backupsEnabled: true
+      backupsEnabled: true
     snapshotsEnabled: true
 
     # Whether to deploy the restic daemonset.
